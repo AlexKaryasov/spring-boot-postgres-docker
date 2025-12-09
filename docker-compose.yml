@@ -18,9 +18,29 @@ services:
     container_name: spring-boot-app
     depends_on:
       - db
+      - clickhouse
     ports:
       - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/demo_db
       SPRING_DATASOURCE_USERNAME: demo_user
       SPRING_DATASOURCE_PASSWORD: demo_pass
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    ports:
+      - "8123:8123"   # HTTP interface
+      - "9000:9000"   # Native TCP interface
+    environment:
+      CLICKHOUSE_USER: ch_user
+      CLICKHOUSE_PASSWORD: clickhouse_pass
+      CLICKHOUSE_DB: default
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    deploy:
+      resources:
+        limits:
+          memory: 2g
